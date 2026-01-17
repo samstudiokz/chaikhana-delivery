@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Чайхана — доставка</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+  .logo{
+  width:120px;
+  height:120px;
+  border-radius:50%;
+  object-fit:cover;
+  box-shadow:0 10px 30px var(--shadow);
+  display:block;
+  margin:0 auto;
+}
+
+.categories{
+  position:sticky;
+  top:0;
+  z-index:15;
+  background:var(--bg);
+  display:flex;
+  gap:10px;
+  padding:10px 16px;
+  overflow-x:auto;
+}
+
+.categories button{
+  padding:8px 14px;
+  border-radius:999px;
+  border:none;
+  background:#eee;
+  font-weight:600;
+  white-space:nowrap;
+}
+
+.categories button.active{
+  background:var(--accent);
+  color:#fff;
+}
+
+.fly{
+  position:fixed;
+  font-size:20px;
+  pointer-events:none;
+  animation:fly .7s ease-out forwards;
+}
+
+@keyframes fly{
+  to{
+    transform:translate(120px,-300px) scale(.2);
+    opacity:0;
+  }
+}
+
+@keyframes pulse{
+  50%{transform:scale(1.15)}
+}
+
+.cart-btn.pulse{
+  animation:pulse .3s;
+}
+
+
+:root{
+  --bg:#f7f3f2;
+  --card:#ffffff;
+  --accent:#7b1e24;
+  --accent-light:#a1333b;
+  --text:#2b1b1b;
+  --muted:#7a5a5a;
+  --shadow:rgba(0,0,0,.15);
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Inter,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+
+header{
+  background:linear-gradient(135deg,var(--accent),var(--accent-light));
+  padding:26px 18px 30px;
+  border-radius:0 0 26px 26px;
+  text-align:center;
+}
+
+
+header h1{margin:0;font-size:26px}
+header p{margin:6px 0 0;font-size:14px;opacity:.9}
+
+.container{
+  padding:16px;
+  max-width:720px;
+  margin:auto;
+}
+
+.card{
+  background:var(--card);
+  border-radius:18px;
+  padding:18px;
+  box-shadow:0 8px 24px var(--shadow);
+  margin-bottom:18px;
+}
+
+.menu{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.item{
+  border:1px solid #eee;
+  border-radius:14px;
+  padding:12px;
+}
+
+.item h3{margin:0;font-size:15px}
+.item p{margin:6px 0;font-size:13px;color:var(--muted)}
+
+.item button{
+  width:100%;
+  background:var(--accent);
+  color:#fff;
+  border:none;
+  padding:10px;
+  border-radius:10px;
+  font-weight:600;
+  transition:.25s;
+}
+
+.item button.added{
+  background:#2e7d32;
+  transform:scale(.95);
+}
+
+
+/* КНОПКА КОРЗИНЫ */
+.cart-btn{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  width:64px;
+  height:64px;
+  border-radius:50%;
+  background:var(--accent);
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:26px;
+  box-shadow:0 10px 30px var(--shadow);
+  z-index:20;
+}
+
+/* МОДАЛКА */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.45);
+  display:none;
+  align-items:flex-end;
+  z-index:30;
+}
+
+.modal.active{display:flex}
+
+.modal-box{
+  background:#fff;
+  width:100%;
+  border-radius:22px 22px 0 0;
+  padding:18px;
+  max-height:90vh;
+  overflow:auto;
+}
+
+.modal-box h2{margin:0 0 12px}
+
+/* контейнеры */
+.counter{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.counter button{
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  border:none;
+  background:var(--accent);
+  color:#fff;
+  font-size:18px;
+}
+
+/* оплата */
+.payments{
+  display:flex;
+  gap:10px;
+  margin-top:10px;
+}
+
+.payments button{
+  flex:1;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid #ddd;
+  background:#fff;
+  font-weight:600;
+}
+
+.payments button.active{
+  background:var(--accent);
+  color:#fff;
+  border:none;
+}
+
+.cart-item{
+  display:flex;
+  justify-content:space-between;
+  font-size:14px;
+  margin-bottom:6px;
+}
+
+.total{
+  font-size:20px;
+  font-weight:700;
+  margin:12px 0;
+}
+
+.whatsapp{
+  display:block;
+  text-align:center;
+  background:#25D366;
+  color:#fff;
+  padding:14px;
+  border-radius:16px;
+  text-decoration:none;
+  font-weight:700;
+}
+@keyframes clickAnim {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.item button.clicked {
+  animation: clickAnim 0.3s ease;
+}
+
+
+.item button.added {
+  background:#2e7d32 !important;
+  animation: addedAnim 0.3s ease;
+}
+@keyframes logoIn {
+  from { opacity:0; transform:scale(.7); }
+  to   { opacity:1; transform:scale(1); }
+}
+
+.logo{
+  animation:logoIn .6s ease-out;
+}
+.cart-count{
+  position:absolute;
+  top:6px;
+  right:6px;
+  background:#fff;
+  color:var(--accent);
+  width:20px;
+  height:20px;
+  border-radius:50%;
+  font-size:12px;
+  font-weight:700;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+#search{
+  width:calc(100% - 32px);
+  margin:8px 16px;
+  padding:12px;
+  border-radius:14px;
+  border:1px solid #ddd;
+  font-size:14px;
+}
+.modal-box input,
+.modal-box textarea{
+  width:100%;
+  padding:12px;
+  margin-top:8px;
+  border-radius:12px;
+  border:1px solid #ddd;
+  font-size:14px;
+  font-family:Inter,sans-serif;
+}
+
+.modal-box textarea{
+  resize:none;
+  height:70px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+  <img src="https://i.ibb.co.com/Kc5sLC66/image.png" class="logo big-logo" alt="Логотип">
+</header>
+
+<div class="categories" id="cats"></div>
+<input id="search" placeholder="Поиск по меню..." />
+
+
+<div class="container">
+  <div class="card">
+    <h2>Меню</h2>
+    <div class="menu" id="menu"></div>
+  </div>
+</div>
+
+<!-- КНОПКА КОРЗИНЫ -->
+<div class="cart-btn" onclick="openCart()">
+  🛒
+  <span class="cart-count" id="cartCount">0</span>
+</div>
+
+
+<!-- МОДАЛКА -->
+<div class="modal" id="modal" onclick="closeCart(event)">
+  <div class="modal-box">
+    <h2>Ваш заказ</h2>
+
+    <div id="cart"></div>
+
+    <h3>Контейнеры (150 тг)</h3>
+    <div class="counter">
+      <button onclick="changeContainers(-1)">−</button>
+      <strong id="containers">0</strong>
+      <button onclick="changeContainers(1)">+</button>
+    </div>
+
+    <h3>Оплата</h3>
+    <div class="payments">
+      <button onclick="setPay(this)">Наличные</button>
+      <button onclick="setPay(this)">Безнал</button>
+    </div>
+<h3>Данные для доставки</h3>
+
+<input id="fio" placeholder="ФИО" />
+<input id="tel" placeholder="Номер телефона" />
+<textarea id="addr" placeholder="Адрес доставки"></textarea>
+
+    <div class="total" id="total">Итого: 0 тг</div>
+
+    <a id="wa" class="whatsapp" target="_blank">Заказать в WhatsApp</a>
+  </div>
+</div>
+
+<script>
+const phone="77011500900";
+
+const menuData = {
+  "Завтраки": [
+    {name:"Английский", price:2200},
+    {name:"Французский", price:2600},
+    {name:"Сырники в сливочно-ванильной завивке", price:1500},
+    {name:"Сырники с ягодным конфи", price:1500},
+    {name:"Овсянная каша", price:1000},
+    {name:"Рисовая каша", price:1000},
+    {name:"Шакшука", price:1400}
+  ],
+  "Салаты": [
+    {name:"Салат из запеченной свеклы", price:1500},
+    {name:"Цезарь с курицей", price:1600},
+    {name:"Греческий", price:1600},
+    {name:"Салат арабский", price:1600},
+    {name:"Тальята из утиного филе", price:2100},
+    {name:"Салат грузинский", price:1500},
+    {name:"Баклажаны по тайски", price:1900},
+    {name:"Ачи-чук", price:1100},
+    {name:"Свежий", price:1200}
+  ],
+  
+  "Супы": [
+  { name: "Солянка", price: 1700, desc: "" },
+  { name: "Шорпа из баранины", price: 1800, desc: "" },
+  { name: "Чечевичный крем-суп", price: 1800, desc: "" },
+  { name: "Пельмени с бульоном", price: 1700, desc: "" },
+  { name: "Нарын из конины", price: 2200, desc: "" },
+  { name: "Лапша по-домашнему", price: 1200, desc: "" },
+  { name: "Мампар", price: 1500, desc: "" },
+  { name: "Суй-ру лагман", price: 1500, desc: "" }
+] ,
+
+"Лагманы": [
+  { name: "Гуй-ру", price: 1800, desc: "" },
+  { name: "Цомян (жареный)", price: 2200, desc: "" },
+  { name: "Дин-дин цомян", price: 2200, desc: "" },
+  { name: "Ган-фан с рисом", price: 1800, desc: "" }
+],
+
+"Горячие салаты": [
+  { name: "Требуха с овощами", price: 2500, desc: "" },
+  { name: "Курица с грибами и овощами", price: 2200, desc: "" },
+  { name: "Мясо по-тайски", price: 2500, desc: "" }
+],
+
+"Вторые блюда": [
+  { name: "Плов «Ташкентский»", price: 2100, desc: "" },
+  { name: "Манты пареные", price: 2000, desc: "" },
+  { name: "Манты жареные", price: 2000, desc: "" },
+  { name: "Казан-кебаб из баранины", price: 3000, desc: "" },
+  { name: "Бешбармак", price: 2500, desc: "" },
+  { name: "Бефстроганов с картофельным пюре", price: 2300, desc: "" },
+  { name: "Жареха", price: 2500, desc: "" },
+  { name: "Паста Болоньезе", price: 1300, desc: "" },
+  { name: "Паста Фетучини с курицей", price: 2000, desc: "" },
+  { name: "Шампиньоны в сливочно-сырном соусе", price: 2200, desc: "" },
+  { name: "Запечённые пельмени", price: 2500, desc: "" },
+  { name: "Жаровня из курицы", price: 1600, desc: "" },
+  { name: "Отбивная куриная", price: 2000, desc: "" }
+],
+
+
+};
+
+const cats=document.getElementById("cats");
+
+Object.keys(menuData).forEach((c,i)=>{
+  cats.innerHTML+=`<button onclick="scrollToCat('${c}',this)" ${i==0?"class='active'":""}>${c}</button>`;
+});
+
+function scrollToCat(c,btn){
+  document.querySelectorAll(".categories button").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  document.getElementById("cat-"+c).scrollIntoView({behavior:"smooth"});
+}
+
+
+let cart={}, containers=0, payment="Наличные";
+
+const menu=document.getElementById("menu");
+const cartDiv=document.getElementById("cart");
+
+renderMenu();
+
+search.oninput = e => renderMenu(e.target.value);
+
+
+function add(n,p){
+  // Обновляем корзину
+  cart[n]=cart[n]?{...cart[n],q:cart[n].q+1}:{price:p,q:1};
+  update();
+const f=document.createElement("div");
+f.textContent="Добавлено!";
+f.className="fly";
+document.body.appendChild(f);
+
+const r=event.target.getBoundingClientRect();
+f.style.left=r.left+"px";
+f.style.top=r.top+"px";
+
+setTimeout(()=>f.remove(),700);
+const c=document.querySelector(".cart-btn");
+c.classList.add("pulse");
+setTimeout(()=>c.classList.remove("pulse"),300);
+
+  // Находим кнопку по имени блюда
+  const btns = document.querySelectorAll(".item button");
+  btns.forEach(btn=>{
+    if(btn.parentElement.querySelector("h3").textContent === n){
+      // Анимация масштаба
+      btn.classList.add("clicked");
+
+      // Меняем текст на "Добавлено "
+      const original = btn.textContent;
+      btn.textContent = "Добавить ";
+
+      // Через 1 секунду возвращаем исходный текст
+      setTimeout(()=>{
+        btn.textContent = original;
+        btn.classList.remove("clicked");
+      },150);
+    }
+  });
+}
+
+function renderMenu(filter=""){
+  menu.innerHTML="";
+  for(let c in menuData){
+    const items = menuData[c].filter(d =>
+      d.name.toLowerCase().includes(filter.toLowerCase())
+    );
+    if(!items.length) continue;
+
+    menu.innerHTML += `<h2 id="cat-${c}" style="grid-column:span 2">${c}</h2>`;
+    items.forEach(d=>{
+      menu.innerHTML += `
+      <div class="item">
+        <h3>${d.name}</h3>
+        <p>${d.price} тг</p>
+        <button onclick="add('${d.name}',${d.price})">Добавить</button>
+      </div>`;
+    });
+  }
+}
+
+
+function update(){
+  cartDiv.innerHTML="";
+  let sum = 0;
+
+  // позиции в корзине
+  for(let k in cart){
+    sum += cart[k].price * cart[k].q;
+    cartDiv.innerHTML += `
+      <div class="cart-item">
+        <span>${k}</span>
+        <div class="counter">
+          <button onclick="changeDish('${k}',-1)">−</button>
+          <strong>${cart[k].q}</strong>
+          <button onclick="changeDish('${k}',1)">+</button>
+        </div>
+        <span>${cart[k].price * cart[k].q} тг</span>
+      </div>
+    `;
+  }
+
+  // контейнеры
+  sum += containers * 150;
+  total.textContent = `Итого: ${sum} тг`;
+
+  // счётчик на корзине
+  let count = 0;
+  for(let k in cart) count += cart[k].q;
+  if(typeof cartCount !== "undefined"){
+    cartCount.textContent = count;
+    cartCount.style.display = count ? "flex" : "none";
+  }
+
+  // формирование WhatsApp текста
+  let txt = "Заказ из Чайханы:%0A";
+  for(let k in cart){
+    txt += `• ${k} × ${cart[k].q}%0A`;
+  }
+  if(containers){
+    txt += `Контейнеры: ${containers} × 150 тг%0A`;
+  }
+
+  // данные клиента
+  const fio = document.getElementById("fio")?.value || "";
+  const tel = document.getElementById("tel")?.value || "";
+  const addr = document.getElementById("addr")?.value || "";
+
+  if(fio)  txt += `ФИО: ${fio}%0A`;
+  if(tel)  txt += `Телефон: ${tel}%0A`;
+  if(addr) txt += `Адрес: ${addr}%0A`;
+
+  txt += `Оплата: ${payment}%0AИтого: ${sum} тг`;
+
+  wa.href = `https://wa.me/${phone}?text=${txt}`;
+}
+
+
+// Функция для изменения количества конкретного блюда в корзине
+function changeDish(name, delta){
+  if(cart[name]){
+    cart[name].q += delta;
+    if(cart[name].q <= 0) delete cart[name]; // удаляем если 0
+    update();
+  }
+}
+
+
+function changeContainers(v){
+  containers=Math.max(0,containers+v);
+  document.getElementById("containers").textContent=containers;
+  update();
+}
+
+function setPay(btn){
+  document.querySelectorAll(".payments button").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  payment=btn.textContent;
+  update();
+}
+
+function openCart(){modal.classList.add("active");update()}
+function closeCart(e){if(e.target.id==="modal")modal.classList.remove("active")}
+
+// автообновление WhatsApp при вводе данных клиента
+["fio","tel","addr"].forEach(id=>{
+  const el = document.getElementById(id);
+  if(el){
+    el.addEventListener("input", update);
+  }
+});
+
+
+</script>
+
+</body>
+</html>
