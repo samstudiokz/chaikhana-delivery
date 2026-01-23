@@ -342,7 +342,7 @@ header p{margin:6px 0 0;font-size:14px;opacity:.9}
 
     <div id="cart"></div>
 
-    <h3>Контейнеры (150 тг)</h3>
+    <h3>Контейнеры (200 тг)</h3>
     <div class="counter">
       <button onclick="changeContainers(-1)">−</button>
       <strong id="containers">0</strong>
@@ -608,7 +608,7 @@ function update(){
   }
 
   // контейнеры
-  sum += containers * 150;
+  sum += containers * 200;
   total.textContent = `Итого: ${sum} тг`;
 
   // счётчик на корзине
@@ -625,7 +625,7 @@ function update(){
     txt += `• ${k} × ${cart[k].q}%0A`;
   }
   if(containers){
-    txt += `Контейнеры: ${containers} × 150 тг%0A`;
+    txt += `Контейнеры: ${containers} × 200 тг%0A`;
   }
 
   // данные клиента
@@ -682,4 +682,5 @@ function closeCart(e){if(e.target.id==="modal")modal.classList.remove("active")}
 
 </body>
 </html>
+
 
